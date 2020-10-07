@@ -1,0 +1,168 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "sliderLib": {
+      "projectType": "library",
+      "root": "projects/slider-lib",
+      "sourceRoot": "projects/slider-lib/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "tsConfig": "projects/slider-lib/tsconfig.lib.json",
+            "project": "projects/slider-lib/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/slider-lib/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/slider-lib/src/test.ts",
+            "tsConfig": "projects/slider-lib/tsconfig.spec.json",
+            "karmaConfig": "projects/slider-lib/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/slider-lib/tsconfig.lib.json",
+              "projects/slider-lib/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "testSliderApp": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/testSliderApp",
+      "sourceRoot": "projects/testSliderApp/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/testSliderApp",
+            "index": "projects/testSliderApp/src/index.html",
+            "main": "projects/testSliderApp/src/main.ts",
+            "polyfills": "projects/testSliderApp/src/polyfills.ts",
+            "tsConfig": "projects/testSliderApp/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              "projects/testSliderApp/src/favicon.ico",
+              "projects/testSliderApp/src/assets"
+            ],
+            "styles": [
+              "projects/testSliderApp/src/styles.scss"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/testSliderApp/src/environments/environment.ts",
+                  "with": "projects/testSliderApp/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "testSliderApp:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "testSliderApp:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "testSliderApp:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/testSliderApp/src/test.ts",
+            "polyfills": "projects/testSliderApp/src/polyfills.ts",
+            "tsConfig": "projects/testSliderApp/tsconfig.spec.json",
+            "karmaConfig": "projects/testSliderApp/karma.conf.js",
+            "assets": [
+              "projects/testSliderApp/src/favicon.ico",
+              "projects/testSliderApp/src/assets"
+            ],
+            "styles": [
+              "projects/testSliderApp/src/styles.scss"
+            ],
+            "scripts": []
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/testSliderApp/tsconfig.app.json",
+              "projects/testSliderApp/tsconfig.spec.json",
+              "projects/testSliderApp/e2e/tsconfig.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        },
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/testSliderApp/e2e/protractor.conf.js",
+            "devServerTarget": "testSliderApp:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "testSliderApp:serve:production"
+            }
+          }
+        }
+      }
+    }},
+  "defaultProject": "sliderLib"
+}
