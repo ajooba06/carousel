@@ -1,14 +1,14 @@
-import {ChangeDetectorRef, Component, ElementRef, ViewChild, EventEmitter, HostBinding, HostListener, Input, Output, OnDestroy, SimpleChanges} from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild, EventEmitter, HostBinding, HostListener, Input, Output, OnDestroy, SimpleChanges } from '@angular/core';
 
-import {Images} from './interfaces';
-import {Touches} from './touches';
-import {Slider} from './slider';
+import { Images } from './interfaces';
+import { Touches } from './touches';
+import { Slider } from './slider';
 
 
 @Component({
-	selector: 'carousel-slider, [carousel-slider]',
+    selector: 'carousel-slider, [carousel-slider]',
     exportAs: 'carousel-slider',
-	templateUrl: './slider.component.html',
+    templateUrl: './slider.component.html',
     styleUrls: ['./slider.component.sass']
 })
 
@@ -34,7 +34,7 @@ export class SliderLibComponent implements OnDestroy {
     rapidlyPositionContainer() {
         this.carousel.rapidlyPositionContainer();
     }
-    
+
     _id: string;
     _images: Images;
     press: any;
@@ -48,9 +48,9 @@ export class SliderLibComponent implements OnDestroy {
     isMoving: boolean;
     isNgContent: boolean;
     cellLength: number;
-    dotsArr:any;
+    dotsArr: any;
 
-    get isLandscape(){
+    get isLandscape() {
         return window.innerWidth > window.innerHeight;
     }
 
@@ -81,11 +81,16 @@ export class SliderLibComponent implements OnDestroy {
     set images(images: Images & any) {
         this._images = images;
     }
-    get images(){
+    get images() {
         return this._images;
     }
 
     @Output() events: EventEmitter<any> = new EventEmitter<any>();
+    
+    @Output() nextClick: EventEmitter<any> = new EventEmitter<any>();
+    @Output() prevClick: EventEmitter<any> = new EventEmitter<any>();
+    @Output() isNextDisabled: EventEmitter<boolean> = new EventEmitter<boolean>();
+    @Output() isPrevDisabled: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     @Input() height: number = 200;
     @Input() width: number;
@@ -108,13 +113,13 @@ export class SliderLibComponent implements OnDestroy {
     @Input() cellsToScroll: number = 1;
 
     @Input('cellWidth') set cellWidth(value: number | '100%') {
-        if (value){
+        if (value) {
             this._cellWidth = value;
         }
     }
 
     @Input('counter') set isCounter(value: boolean) {
-        if (value){
+        if (value) {
             this._isCounter = value;
         }
     }
@@ -142,11 +147,7 @@ export class SliderLibComponent implements OnDestroy {
 
     @HostListener('window:resize', ['$event'])
     onWindowResize(event: any) {
-        this.landscapeMode = this.isLandscape;
-        this.ref.detectChanges();
-
-        this.initCarousel();
-        this.carousel.queueCells();
+        this.reRenderCarousel();
     }
 
     @HostListener('mousemove', ['$event'])
@@ -164,11 +165,16 @@ export class SliderLibComponent implements OnDestroy {
     }
 
     constructor(
-        private elementRef: ElementRef, 
-        private ref: ChangeDetectorRef){
+        private elementRef: ElementRef,
+        private ref: ChangeDetectorRef) {
     }
-
-    ngOnInit(){
+    reRenderCarousel() {
+        this.landscapeMode = this.isLandscape;
+        this.ref.detectChanges();
+        this.initCarousel();
+        this.carousel.queueCells();
+    }
+    ngOnInit() {
         this.isNgContent = this.cellsElement.children.length > 0;
 
         this.press = new Touches({
@@ -241,10 +247,10 @@ export class SliderLibComponent implements OnDestroy {
             this.onDomChanges();
         });
 
-        var config = { 
-            attributes: true, 
-            childList: true, 
-            characterData: true 
+        var config = {
+            attributes: true,
+            childList: true,
+            characterData: true
         };
         observer.observe(this.elementRef.nativeElement, config);
     }
@@ -331,11 +337,13 @@ export class SliderLibComponent implements OnDestroy {
     next() {
         this.carousel.next(this.cellsToScroll);
         this.carousel.stopAutoplay();
+        this.nextClick.emit();
     }
 
     prev() {
         this.carousel.prev(this.cellsToScroll);
         this.carousel.stopAutoplay();
+        this.prevClick.emit();
     }
 
     select(index: number) {
@@ -343,11 +351,15 @@ export class SliderLibComponent implements OnDestroy {
     }
 
     isNextArrowDisabled() {
-        return this.carousel.isNextArrowDisabled();
+        const isDisabled = this.carousel.isNextArrowDisabled();
+        this.isNextDisabled.emit(isDisabled);
+        return isDisabled;
     }
 
     isPrevArrowDisabled() {
-        return this.carousel.isPrevArrowDisabled();
+        const isDisabled = this.carousel.isPrevArrowDisabled();
+        this.isPrevDisabled.emit(isDisabled);
+        return isDisabled;
     }
 
     getCellLength() {
